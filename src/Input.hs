@@ -21,19 +21,15 @@ defaultKeybinds = Keybinds {
 }
 
 data Input = Input {
-  up :: Double,
-  down :: Double,
-  left :: Double,
-  right :: Double,
+  vertical :: Double,
+  horizontal :: Double,
   jump :: Double,
   kick :: Bool
 } deriving (Show)
 
 defaultInput = Input {
-  up = 0,
-  down = 0,
-  left = 0,
-  right = 0,
+  vertical = 0,
+  horizontal = 0,
   jump = 0,
   kick = True
 }
@@ -47,10 +43,8 @@ keybindsToInput keybinds = do
   jump <- isKeyPressed (jumpBind keybinds)
   kick <- isKeyPressed (kickBind keybinds)
   return $ Input {
-    up = ohFuck up,
-    down = ohFuck down,
-    left = ohFuck left,
-    right = ohFuck right,
+    vertical = (ohFuck up) - (ohFuck down),
+    horizontal = (ohFuck right) - (ohFuck left),
     jump = ohFuck jump,
     kick = kick
   }

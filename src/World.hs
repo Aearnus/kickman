@@ -1,32 +1,24 @@
-{-# LANGUAGE ExistentialQuantification #-}
-
 module World where
 
 import Input
 import SFML.Graphics
 import SFML.System
+import Types
+import Characters
+import Debug.Trace
 
-class (SFDrawable b) => BaseCharacter b where
-  update :: b -> World -> Input -> b
-data Character = forall b. BaseCharacter b => Character b
-instance SFDrawable Character where
-  draw t char rens = return ()
-instance BaseCharacter Character where
-  update (Character b) = update $ Character b
+defaultWorld = World { characters = [Character kickman] }
 
-data World = World {
-  characters :: [Character]
-}
-defaultWorld = World { characters = [] }
+updateWorld :: World           -- The World to update
+               -> [Input]      -- The currently pressed inputs
+               -> Time         -- The time elapsed since the last update
+               -> World        -- The new World
+updateWorld world input elapsed =
+  let charactersAndInputs  = zip input (characters world)
+      updatedCharacters    = map (\c -> updateCharacter (snd c) world (fst c) elapsed) charactersAndInputs
+  in world { characters = updatedCharacters }
 
 instance SFDrawable World where
   draw t world rens = do
-    eitherRect <- createRectangleShape
-    case eitherRect of
-      Left _ -> do
-        return ()
-      Right rect -> do
-        setFillColor rect blue
-        setSize rect (Vec2f 500 500)
-        setPosition rect (Vec2f 0.5 0.5)
-        drawRectangle t rect rens
+    putStrLn "drawing world"
+    mapM_ (\char -> draw t char rens) (characters world)

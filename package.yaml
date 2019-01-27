@@ -34,7 +34,6 @@ executables:
     - -threaded
     - -rtsopts
     - -with-rtsopts=-N
-    - -g
     dependencies:
     - kickman-hs
 
