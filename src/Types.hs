@@ -22,6 +22,12 @@ data Stats = Stats {
   weight :: Double,
   hitboxes :: [Hitbox]
 }
+defaultStats = Stats {
+  maxHp = 0,
+  speed = 0,
+  weight = 0,
+  hitboxes = []
+}
 
 data VolatileInfo = VolatileInfo {
   position :: (Double, Double),
@@ -32,18 +38,17 @@ defaultInfo = VolatileInfo {
   velocity = (0,0)
 }
 
-class (SFDrawable b) => Character_ b where
-  updateCharacter :: b         -- The Character_ to update
-                     -> World  -- The world the Character_ is in
-                     -> Input  -- The currently pressed inputs
-                     -> Time   -- The time elapsed between updates
-                     -> b      -- The updated Character_
-  stats :: b -> Stats
-  info :: b -> VolatileInfo
-data Character = forall b. Character_ b => Character b
+data Character = Character {
+  updateCharacter :: Character    -- The Character to update
+                    -> World      -- The world the Character is in
+                    -> Input      -- The currently pressed inputs
+                    -> Time       -- The time elapsed between updates
+                    -> Character, -- The updated Character
+  stats :: Stats,
+  info :: VolatileInfo
+}
 instance Show Character where
   show char = "CharacterData"
-
 
 -- World Types
 data World = World {

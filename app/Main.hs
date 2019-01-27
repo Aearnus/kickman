@@ -17,26 +17,15 @@ shouldClose e = case e of
 
 eventLoop :: RenderWindow -> GameState -> Clock -> IO ()
 eventLoop win gs frameClock = do
-  putStrLn "1"
   clearRenderWindow win white
-  putStrLn "2"
   draw win gs Nothing
-  putStrLn "3"
   display win
-  putStrLn "4"
   elapsedTime <- restartClock frameClock
-  putStrLn "5"
   maybeEvent <- pollEvent win
-  putStrLn "6"
   input <- keybindsToInput defaultKeybinds
-  putStrLn "7"
   let willClose = shouldClose maybeEvent
-  putStrLn "8"
   let gs' = updateGameState gs [input] elapsedTime
-  putStrLn "9"
-  sfSleep $ milliseconds 50
-  putStrLn "10"
-  trace (show input) $ unless willClose (eventLoop win gs' frameClock)
+  unless willClose (eventLoop win gs' frameClock)
 
 main :: IO ()
 main = do

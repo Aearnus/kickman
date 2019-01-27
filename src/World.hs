@@ -7,7 +7,7 @@ import Types
 import Characters
 import Debug.Trace
 
-defaultWorld = World { characters = [Character kickman] }
+defaultWorld = World { characters = [kickman] }
 
 updateWorld :: World           -- The World to update
                -> [Input]      -- The currently pressed inputs
@@ -15,10 +15,8 @@ updateWorld :: World           -- The World to update
                -> World        -- The new World
 updateWorld world input elapsed =
   let charactersAndInputs  = zip input (characters world)
-      updatedCharacters    = map (\c -> updateCharacter (snd c) world (fst c) elapsed) charactersAndInputs
+      updatedCharacters    = map (\(i, c) -> (updateCharacter c) c world i elapsed) charactersAndInputs
   in world { characters = updatedCharacters }
 
 instance SFDrawable World where
-  draw t world rens = do
-    putStrLn "drawing world"
-    mapM_ (\char -> draw t char rens) (characters world)
+  draw t world rens = mapM_ (\char -> draw t char rens) (characters world)

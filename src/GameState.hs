@@ -11,7 +11,7 @@ data Scene = InMainMenu | InGame World
 
 instance SFDrawable Scene where
   draw t InMainMenu rens = return ()
-  draw t (InGame world) rens = trace "drawing scene" $ draw t world rens
+  draw t (InGame world) rens = draw t world rens
 
 data GameState = GameState {
   currentScene :: Scene,
@@ -33,4 +33,4 @@ updateGameState gs input elapsed =
     InGame world -> gs { currentScene = InGame (updateWorld world input elapsed) }
 
 instance SFDrawable GameState where
-  draw t gs rens = trace "drawing gamestate" $ draw t (currentScene gs) rens
+  draw t gs rens = draw t (currentScene gs) rens
