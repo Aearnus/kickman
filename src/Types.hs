@@ -10,40 +10,41 @@ module Types where
 import SFML.Graphics
 import SFML.System
 import Input
+import Coords
 
+-- Character types
 data Hitbox = Hitbox {
-  corner1 :: (Double, Double),
-  corner2 :: (Double, Double)
+  corner1 :: LocalCharacterCoords,
+  corner2 :: LocalCharacterCoords
 }
 
 data Stats = Stats {
   maxHp :: Double,
-  speed :: Double,
+  groundSpeed :: Double,
+  fallSpeed :: Double,
   weight :: Double,
   hitboxes :: [Hitbox]
 }
 defaultStats = Stats {
   maxHp = 0,
-  speed = 0,
+  groundSpeed = 0,
+  fallSpeed = 0,
   weight = 0,
   hitboxes = []
 }
 
 data VolatileInfo = VolatileInfo {
-  position :: (Double, Double),
-  velocity :: (Double, Double)
+  position :: MapCoords,
+  velocity :: MapCoords,
+  onGround :: Bool
 }
 defaultInfo = VolatileInfo {
   Types.position = (0,0),
-  velocity = (0,0)
+  velocity = (0,0),
+  onGround = False
 }
 
 data Character = Character {
-  updateCharacter :: Character    -- The Character to update
-                    -> World      -- The world the Character is in
-                    -> Input      -- The currently pressed inputs
-                    -> Time       -- The time elapsed between updates
-                    -> Character, -- The updated Character
   stats :: Stats,
   info :: VolatileInfo
 }
@@ -54,3 +55,10 @@ instance Show Character where
 data World = World {
   characters :: [Character]
 } deriving (Show)
+
+data Platform = Platform {
+  boundingBox :: MapCoords
+}
+data MapData = MapData {
+  solidPlatforms :: [Platform]
+}

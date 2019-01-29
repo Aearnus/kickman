@@ -15,7 +15,7 @@ updateWorld :: World           -- The World to update
                -> World        -- The new World
 updateWorld world input elapsed =
   let charactersAndInputs  = zip input (characters world)
-      updatedCharacters    = map (\(i, c) -> (updateCharacter c) c world i elapsed) charactersAndInputs
+      updatedCharacters    = map (\(i, c) -> updateCharacter c world i elapsed) charactersAndInputs
   in world { characters = updatedCharacters }
 
 instance SFDrawable World where

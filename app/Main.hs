@@ -8,6 +8,7 @@ import GameState
 import Input
 import Control.Monad
 import Debug.Trace
+import Config
 
 shouldClose e = case e of
   Nothing -> False
@@ -29,7 +30,7 @@ eventLoop win gs frameClock = do
 
 main :: IO ()
 main = do
-  window <- createRenderWindow (VideoMode 1366 768 8) "Kickmen" [SFClose] Nothing
+  window <- createRenderWindow (VideoMode res_WIDTH res_HEIGHT 8) "Kickmen" [SFClose] Nothing
   frameClock <- createClock
   eventLoop window defaultGameState frameClock
   close window
