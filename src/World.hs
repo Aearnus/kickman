@@ -6,8 +6,9 @@ import SFML.System
 import Types
 import Characters
 import Debug.Trace
+import MapData
 
-defaultWorld = World { characters = [kickman] }
+defaultWorld = World { characters = [kickman], mapData = MapData {} }
 
 updateWorld :: World           -- The World to update
                -> [Input]      -- The currently pressed inputs

@@ -53,12 +53,13 @@ instance Show Character where
 
 -- World Types
 data World = World {
-  characters :: [Character]
+  characters :: [Character],
+  mapData :: MapData
 } deriving (Show)
 
 data Platform = Platform {
-  boundingBox :: MapCoords
-}
+  boundingBox :: (MapCoords, MapCoords)
+} deriving (Show)
 data MapData = MapData {
   solidPlatforms :: [Platform]
-}
+} deriving (Show)
