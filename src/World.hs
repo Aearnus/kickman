@@ -7,8 +7,16 @@ import Types
 import Characters
 import Debug.Trace
 import MapData
+import Coords
 
-defaultWorld = World { characters = [kickman], mapData = MapData {} }
+defaultWorld = World {
+  characters = [kickman],
+  mapData = MapData {
+    solidPlatforms = [Platform {
+      boundingBox = (Coords (-64, 64), Coords (64, -64))
+    }]
+  }
+}
 
 updateWorld :: World           -- The World to update
                -> [Input]      -- The currently pressed inputs
@@ -20,4 +28,6 @@ updateWorld world input elapsed =
   in world { characters = updatedCharacters }
 
 instance SFDrawable World where
-  draw t world rens = mapM_ (\char -> draw t char rens) (characters world)
+  draw t world rens = do
+    mapM_ (\char -> draw t char rens) (characters world)
+    draw t (mapData world) rens

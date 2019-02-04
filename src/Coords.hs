@@ -1,39 +1,47 @@
 {-# LANGUAGE TypeSynonymInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE KindSignatures #-}
+{-# LANGUAGE DeriveFunctor #-}
 
 module Coords where
 
 import Config
+import Debug.Trace
+import Data.Function
 
 res_WIDTH_D :: Double
 res_WIDTH_D = fromIntegral res_WIDTH
 res_HEIGHT_D :: Double
 res_HEIGHT_D = fromIntegral res_HEIGHT
 
-type Coords = (Double, Double)
-instance Num Coords where
-  (+) (x1, y1) (x2, y2) = (x1 + x2, y1 + y2)
-  (-) (x1, y1) (x2, y2) = (x1 - x2, y1 - y2)
-  (*) (x1, y1) (x2, y2) = (x1 * x2, y1 * y2)
-  abs                   = fmap abs
-  signum                = fmap signum
-  fromInteger a         = error "nonsense"
+remeasure :: Floating a =>
+             a -> a -- prebounds
+          -> a -> a -- postbounds
+          -> a      -- prevalue
+          -> a
+remeasure prebottom pretop postbottom posttop value =
+  let percentThrough = (value - prebottom) / (pretop - prebottom)
+  in  ((posttop - postbottom) * percentThrough) + postbottom
+
+data CoordType = MapCoords | ScreenCoords
+newtype Coords (a :: CoordType) = Coords (Double, Double) deriving (Show)
 
 -- bounded vertically from -128 to 128
-type MapCoords = Coords
 class ToMapCoords cs where
-  toMapCoords :: cs -> MapCoords
-instance ToScreenCoords MapCoords where
-  toScreenCoords (x, y) = (((x / 256) + 0.5) * res_HEIGHT_D, ((y / 256) + 0.5) * res_HEIGHT_D)
+  toMapCoords :: cs -> Coords MapCoords
+instance ToScreenCoords (Coords MapCoords) where
+  toScreenCoords (Coords (x, y)) = Coords $ ((,) `on` (remeasure 128 (-128) 0 res_HEIGHT_D)) x y
 
 -- bounded from 0 to RES_WIDTH and RES_HEIGHT
-type ScreenCoords = Coords
 class ToScreenCoords cs where
-  toScreenCoords :: cs -> ScreenCoords
-instance ToMapCoords ScreenCoords where
-  toMapCoords (x, y) = (((x / res_HEIGHT_D) * 256) - 128, ((y / res_HEIGHT_D) * 256) - 128)
+  toScreenCoords :: cs -> Coords ScreenCoords
+instance ToMapCoords (Coords ScreenCoords) where
+  toMapCoords (Coords (x, y)) = Coords $ ((,) `on` (remeasure 0 res_HEIGHT_D 128 (-128))) x y
 
-type LocalCharacterCoords = Coords
-type HitboxCharacterCoords = (LocalCharacterCoords, MapCoords)
-instance ToMapCoords HitboxCharacterCoords where
-  toMapCoords (local, global) = local + global
+type LocalCharacterCoords = Coords MapCoords
+type HitboxCharacterCoords = (Coords MapCoords, Coords MapCoords)
+-- instance ToMapCoords HitboxCharacterCoords where
+--   toMapCoords (local, global) = local + global
+-- instance ToScreenCoords HitboxCharacterCoords where
+--   toScreenCoords cs = toScreenCoords ((toMapCoords cs) :: MapCoords)

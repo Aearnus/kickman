@@ -1,4 +1,5 @@
 {-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE DataKinds #-}
 
 module Types where
 
@@ -34,14 +35,18 @@ defaultStats = Stats {
 }
 
 data VolatileInfo = VolatileInfo {
-  position :: MapCoords,
-  velocity :: MapCoords,
-  onGround :: Bool
+  position :: Coords MapCoords,
+  velocity :: Coords MapCoords,
+  acceleration :: Coords MapCoords,
+  onGround :: Bool,
+  hitstunTimeLeft :: Double
 }
 defaultInfo = VolatileInfo {
-  Types.position = (0,0),
-  velocity = (0,0),
-  onGround = False
+  Types.position = Coords (0,0),
+  velocity = Coords (0,0),
+  acceleration = Coords (0,0),
+  onGround = False,
+  hitstunTimeLeft = 0
 }
 
 data Character = Character {
@@ -58,7 +63,7 @@ data World = World {
 } deriving (Show)
 
 data Platform = Platform {
-  boundingBox :: (MapCoords, MapCoords)
+  boundingBox :: (Coords MapCoords, Coords MapCoords)
 } deriving (Show)
 data MapData = MapData {
   solidPlatforms :: [Platform]

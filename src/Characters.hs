@@ -18,7 +18,7 @@ instance SFDrawable Character where
       Right rect -> do
         setFillColor rect blue
         setSize rect $ Vec2f 15 15
-        let screenPos = toScreenCoords . Types.position . info $ char
+        let (Coords screenPos) = toScreenCoords . Types.position . info $ char
         setPosition rect $ Vec2f (realToFrac . fst $ screenPos) (realToFrac . snd $ screenPos)
         drawRectangle t rect rens
 
@@ -38,18 +38,34 @@ updateCharacter char world input elapsed =
   char {
     info = (info char) {
       Types.position =
-        let (x, y) = (Types.position . info) char
-            (vx, vy) = (Types.velocity . info) char
+        let (Coords (x, y)) = (Types.position . info) char
+            (Coords (vx, vy)) = (Types.velocity . info) char
             t = realToFrac $ asSeconds elapsed
-        in (x + t*vx, y + t*vy),
+        in Coords (x + t*vx, y + t*vy),
       Types.velocity =
-        let (vx, vy) = (Types.velocity . info) char
+        let (Coords (vx, vy)) = (Types.velocity . info) char
+            (Coords (ax, ay)) = (acceleration . info) char
             groundSpeed' = (groundSpeed . stats) char
             weight' = (weight . stats) char
             t = realToFrac $ asSeconds elapsed
-        in (bound (abs $ groundSpeed' * (horizontal input)) ((t * groundSpeed' * (1 / weight') * (horizontal input)) + vx), 0)
+            -- velocity specific things
+            vxFromInput = bound (abs $ groundSpeed' * (horizontal input)) ((t * groundSpeed' * (1 / weight') * (horizontal input)) + vx)
+            vxFromAccel = t*ax
+            vyFromAccel = t*ay
+        in
+          Coords (
+            vxFromInput + vxFromAccel,
+            vyFromAccel
+          ),
+      Types.acceleration =
+        let t = realToFrac $ asSeconds elapsed
+        in Coords (0, -9.8)
     }
   }
+  where
+    canJump :: Character -> Bool
+    canJump char = let info_ = info char in onGround info_
+
 
 baseCharacter :: Character
 baseCharacter = Character {
